@@ -6,7 +6,7 @@
 
 EspSdrTx tx;
 
-static const uint32_t KHZ = 2400000;
+static const uint32_t KHZ = 2442000;
 /*
  * 16000 samples are 200 us at 80 MS/s, which holds CYCLES = 200 whole
  * cycles of 1 MHz, so the loop repeats without a jump.

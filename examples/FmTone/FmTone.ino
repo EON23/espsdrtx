@@ -13,7 +13,7 @@ static const uint32_t PERIOD = 80;
 /* Output samples per audio sample: 2 MS/s / 64 = 31.25 kS/s audio. */
 static const uint32_t DIV = 64;
 static const uint32_t AUDIO_RATE = 31250;	/* audio samples per second */
-static const uint32_t KHZ = 2400000;		/* the tuned frequency */
+static const uint32_t KHZ = 2442000;		/* the tuned frequency */
 static const int32_t OFFSET_HZ = 250000;	/* carrier above KHZ */
 static const int32_t DEV_HZ = 75000;		/* peak frequency deviation */
 static const int AMP = 50;			/* peak DAC word */
@@ -46,15 +46,11 @@ void setup()
 	for (int k = 0; k < SINE_LEN; k++)
 		sine[k] = 128 + lroundf(127 * sinf(2 * (float)M_PI * k /
 						   SINE_LEN));
-	// if (tx.begin(KHZ) != ESP_OK) {
-	// 	Serial.println("espsdrtx begin failed");
-	// 	while (true)
-	// 		Serial.println("NO STARTUP");
-	// 		delay(1000);
-	// }
-	tx.allowOutOfBand(true);
-	tx.begin(KHZ);
-	Serial.println("INIT");
+	if (tx.begin(KHZ) != ESP_OK) {
+		Serial.println("espsdrtx begin failed");
+		while (true)
+			delay(1000);
+	}
 }
 
 void loop()
