@@ -1,0 +1,22 @@
+{
+  "global": {
+    "core:datatype": "ci8",
+    "core:sample_rate": 20000000.0,
+    "core:version": "1.0.0",
+    "core:description": "espsdrtx Packet example on a Seeed XIAO ESP32-C6 (on-board antenna): QPSK, 5 Msym/s (16 samples per symbol at 80 MS/s), RRC 0.35, rms word 25, payload 'hello from espsdrtx', sequence 0; one 3200-sample (40 us) loop repeated. Carrier 2442 MHz; HackRF centred at 2440 MHz, so the packet is centred at +2 MHz. packet_qpsk_reference.cs16 holds the same loop built on a PC by espsdrtx_sc_packet (int16 I/Q, 80 MS/s).",
+    "core:hw": "HackRF One (firmware 2024.02.1), LNA 16 dB, VGA 20 dB, amp off; over the air, no cable",
+    "core:recorder": "hackrf_transfer 2026.01.3",
+    "core:license": "https://www.gnu.org/licenses/gpl-3.0.html",
+    "espsdrtx:esp_carrier_hz": 2442000000,
+    "espsdrtx:example": "examples/Packet",
+    "espsdrtx:loop_samples_80msps": 3200
+  },
+  "captures": [
+    {
+      "core:sample_start": 0,
+      "core:frequency": 2440000000.0,
+      "core:datetime": "2026-11-04T02:07:55Z"
+    }
+  ],
+  "annotations": []
+}

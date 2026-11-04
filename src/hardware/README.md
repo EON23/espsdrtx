@@ -7,6 +7,7 @@ streams feed the watchdogs through ESP-IDF's HAL, which every ESP32 has.)
 | Directory | Chip | Status |
 |---|---|---|
 | `esp32c3/` | ESP32-C3 | Supported; boards tested are in its README |
+| `esp32c6/` | ESP32-C6 | Supported (Arduino); boards tested are in its README |
 
 ## What a port provides
 
@@ -32,7 +33,10 @@ to the table above, and to "Tested hardware" in the library README.
 ## The model a port has to fit
 
 The core assumes the radio plays sample words from a RAM bank in a loop of n
-words at 40 or 80 MS/s, and that a one-word loop at 80 MS/s follows every CPU
-store to its word (the streams rely on that). A word holds I and Q as two's
+words at 40 or 80 MS/s, and that some word the CPU can store to reaches the
+DAC as soon as it is written (the streams rely on that). By default that word
+is the bank's first, played as a one-word loop at 80 MS/s (the C3); a port
+whose engine shuts the CPU out of the bank names another in `HW_STREAM_WORD`
+(the C6 uses the front end's TX DC register). A word holds I and Q as two's
 complement fields of the same width, I in the low bits. A chip whose engine
 works differently needs the interface changed, not just a new port.

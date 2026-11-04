@@ -12,11 +12,12 @@
  *     hardware, at 40 or 80 MS/s. The CPU is free meanwhile, but may not
  *     write the bank: stores into a playing loop longer than 4 words get
  *     lost or land in the wrong place (seen on the C3).
- *   - Stream (espsdrtx_*_stream): the engine plays a one-word loop at
- *     80 MS/s, and the CPU rewrites that word every `period` CPU cycles, so
- *     the sample rate is the CPU clock / period (on the 160 MHz C3, each
- *     value is held for period / 2 DAC samples), set by how fast the CPU can
- *     compute samples.
+ *   - Stream (espsdrtx_*_stream): the CPU rewrites one word, the port's
+ *     HW_STREAM_WORD, every `period` CPU cycles, so the sample rate is the
+ *     CPU clock / period, set by how fast the CPU can compute samples. On
+ *     the C3 that word is a one-word loop the engine plays at 80 MS/s (each
+ *     value is held for period / 2 DAC samples); on the C6, whose engine
+ *     shuts the CPU out of its bank, it is the front end's TX DC register.
  */
 #include "espsdrtx.h"
 
@@ -80,6 +81,8 @@
 #define TWO_PI		6.283185307179586
 
 static volatile uint32_t *const bank = HW_BANK;
+/* The word a stream rewrites: the one-word loop, or a port's own register. */
+static volatile uint32_t *const stream_word = HW_STREAM_WORD;
 static bool started, tx_on;
 static bool out_of_band;	/* espsdrtx_allow_out_of_band */
 static int dc_i, dc_q;		/* espsdrtx_set_dc */
@@ -316,7 +319,7 @@ static void stream_on(struct stream *s)
 	s->feed_every =
 		esp_rom_get_cpu_ticks_per_us() * WDT_FEED_US / s->period + 1;
 	portDISABLE_INTERRUPTS();
-	bank[0] = 0;
+	*stream_word = 0;
 	hw_tx_take();
 	hw_stream_run();
 }
@@ -324,7 +327,7 @@ static void stream_on(struct stream *s)
 static void stream_off(void)
 {
 	hw_tx_off();
-	bank[0] = 0;
+	*stream_word = 0;
 	hw_release();
 	portENABLE_INTERRUPTS();
 	hw_to_rx();
@@ -356,7 +359,7 @@ static IRAM_ATTR NOINLINE_ATTR void feed_wdts(void)
 		while ((int32_t)((now = esp_cpu_get_cycle_count()) -	\
 				 target) < 0) {				\
 		}							\
-		bank[0] = (word);					\
+		*stream_word = (word);					\
 		if (now - target > s->st.worst)				\
 			s->st.worst = now - target;			\
 		if (now - target >= s->period)				\

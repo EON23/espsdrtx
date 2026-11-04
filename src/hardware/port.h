@@ -17,6 +17,8 @@
  *
  * Macros each port.h defines:
  *   HW_BANK		volatile uint32_t *: the loop's first word
+ *   HW_STREAM_WORD	volatile uint32_t *: the word a stream rewrites; optional,
+ *			HW_BANK (the one-word loop) when the port leaves it out
  *   HW_WORD_FIELD	mask of one field, e.g. 0x3ffu for 10 bits
  *   HW_WORD_Q_SHIFT	bit where the Q field starts
  *   HW_LOCK_LO_KHZ	lowest carrier, kHz, where the PLL locks
@@ -32,6 +34,13 @@
 
 #if CONFIG_IDF_TARGET_ESP32C3
 #include "esp32c3/port.h"
+#elif CONFIG_IDF_TARGET_ESP32C6
+#include "esp32c6/port.h"
+#endif
+
+/* A port whose streams play from the bank needs no HW_STREAM_WORD. */
+#ifndef HW_STREAM_WORD
+#define HW_STREAM_WORD	HW_BANK
 #endif
 
 /**

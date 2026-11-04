@@ -1,0 +1,22 @@
+{
+  "global": {
+    "core:datatype": "ci8",
+    "core:sample_rate": 20000000.0,
+    "core:version": "1.0.0",
+    "core:description": "espsdrtx FmTone example on a Seeed XIAO ESP32-C6 (on-board antenna): CPU-paced FM stream through FE_TXDC, 2 MS/s (period 80 cycles), 1 kHz audio tone, 75 kHz deviation, on a carrier 250 kHz above 2442 MHz, amplitude 50. HackRF centred at 2441 MHz: the FM signal is at +1.25 MHz (spread +1.175 to +1.325 MHz), the tuned LO's leak at +1 MHz.",
+    "core:hw": "HackRF One (firmware 2024.02.1), LNA 16 dB, VGA 20 dB, amp off; over the air, no cable",
+    "core:recorder": "hackrf_transfer 2026.01.3",
+    "core:license": "https://www.gnu.org/licenses/gpl-3.0.html",
+    "espsdrtx:esp_carrier_hz": 2442000000,
+    "espsdrtx:fm_center_hz": 2442250000,
+    "espsdrtx:example": "examples/FmTone"
+  },
+  "captures": [
+    {
+      "core:sample_start": 0,
+      "core:frequency": 2441000000.0,
+      "core:datetime": "2026-11-04T01:59:43Z"
+    }
+  ],
+  "annotations": []
+}

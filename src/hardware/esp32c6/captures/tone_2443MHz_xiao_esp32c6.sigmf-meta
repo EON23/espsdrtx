@@ -1,0 +1,22 @@
+{
+  "global": {
+    "core:datatype": "ci8",
+    "core:sample_rate": 20000000.0,
+    "core:version": "1.0.0",
+    "core:description": "espsdrtx Tone example on a Seeed XIAO ESP32-C6 (on-board antenna): carrier 2442 MHz, complex tone 1 MHz above it (2443 MHz), amplitude 100, 80 MS/s loop of 16000 words. HackRF centred 1 MHz below the carrier, so the carrier leak is at +1 MHz and the tone at +2 MHz; the image would be at 0 Hz, where the HackRF's own DC spike also sits.",
+    "core:hw": "HackRF One (firmware 2024.02.1), LNA 16 dB, VGA 20 dB, amp off; over the air, no cable",
+    "core:recorder": "hackrf_transfer 2026.01.3",
+    "core:license": "https://www.gnu.org/licenses/gpl-3.0.html",
+    "espsdrtx:esp_carrier_hz": 2442000000,
+    "espsdrtx:tone_hz": 2443000000,
+    "espsdrtx:example": "examples/Tone"
+  },
+  "captures": [
+    {
+      "core:sample_start": 0,
+      "core:frequency": 2441000000.0,
+      "core:datetime": "2026-11-04T01:58:58Z"
+    }
+  ],
+  "annotations": []
+}
