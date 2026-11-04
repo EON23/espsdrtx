@@ -56,10 +56,14 @@ Measured on the XIAO, tuned to 2442 MHz unless noted:
 - **Streams:** FmTone, AmTone and PmTone (2 MS/s, period 80) ran 10 s each with
   16 to 35 of 20 million samples late. A period of 48 still nearly kept up
   (1527 of 10 million late), 40 did not.
-- **Stream carrier leak:** each write to `FE_TXDC` adds a little DC, so the
-  leak grows with the stream rate: about -31 dBc at 400 kS/s and -16 dBc at
-  2 MS/s (amplitude 100). In a coarse test `espsdrtx_set_dc` did not reduce
-  it. Keep the signal offset from the carrier, as the examples do (250 kHz).
+- **Stream carrier leak:** the leak grew with the stream rate: about
+  -31 dBc at 400 kS/s and -16 dBc at 2 MS/s (a constant-frequency stream,
+  amplitude 100), as if each write to `FE_TXDC` added a little DC. In a
+  coarse test `espsdrtx_set_dc` did not reduce it. It may not be the C6's
+  alone: in the FmTone example the leak was -23 dBc of the FM signal's power
+  on both the C6 and the C3, and the C3's leak against stream rate has not
+  been measured. Keep the signal offset from the carrier, as the examples do
+  (250 kHz).
 - **Level:** output rose 6 dB from amplitude 100 to 200 and only 1 dB from 250
   to 511, so it compresses from about 200.
 - **XIAO with its on-board antenna:** a carrier or loop amplitude above about

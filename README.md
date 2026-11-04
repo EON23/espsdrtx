@@ -185,8 +185,9 @@ Things to know:
 - **Level:** there is no gain control, only the sample amplitude. The output compresses
   above about 256 at 40 MS/s and 128 at 80 MS/s (C3), and from about 200 at 80 MS/s (C6).
 - **LO leakage:** the carrier leaks through as a DC term unless `espsdrtx_set_dc` cancels it.
-  On the C6, streams leak more the faster they run (about -16 dBc at 2 MS/s), and
-  `espsdrtx_set_dc` did not cancel it; keep stream signals offset from the carrier.
+  Streams leak more: on the C6 the leak grew with the stream rate (about -16 dBc at
+  2 MS/s) and `espsdrtx_set_dc` did not cancel it, and in the FmTone example both chips
+  leaked -23 dBc; keep stream signals offset from the carrier.
 - **Undocumented internals:** the library relies on libphy functions Espressif does not
   document (on the C3: `g_phyFuns[50]`, `set_chanfreq`, `phy_set_freq`, ROM `pbus` calls;
   on the C6: `force_txon_mode`, `set_chanfreq`, `phy_set_freq`, ESP-IDF's
@@ -216,8 +217,8 @@ Things to know:
 The numbers in this README (levels, leakage, stream rates, tuning range) were measured on
 the C3 board unless marked C6. Per-chip notes, tested boards and measurements are in
 `src/hardware/<chip>/README.md` ([`esp32c3`](src/hardware/esp32c3/README.md),
-[`esp32c6`](src/hardware/esp32c6/README.md), which also has HackRF recordings of the
-examples). Reports from other boards are welcome.
+[`esp32c6`](src/hardware/esp32c6/README.md)); both have HackRF recordings of the
+examples with spectrum images. Reports from other boards are welcome.
 
 ## Adding a chip
 
