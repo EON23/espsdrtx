@@ -10,8 +10,11 @@
 
 EspSdrTx tx;
 
-/* CPU cycles per output sample: 160 MHz / 80 = 2 MS/s. */
-static const uint32_t PERIOD = 80;
+/*
+ * CPU cycles per output sample, for 2 MS/s: 80 at 160 MHz (C3, C6), 120 at
+ * 240 MHz (S3).
+ */
+static const uint32_t PERIOD = F_CPU / 2000000;
 /* Output samples per audio sample: 2 MS/s / 64 = 31.25 kS/s audio. */
 static const uint32_t DIV = 64;
 static const uint32_t AUDIO_RATE = 31250;	/* audio samples per second */

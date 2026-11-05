@@ -36,6 +36,8 @@
 #include "esp32c3/port.h"
 #elif CONFIG_IDF_TARGET_ESP32C6
 #include "esp32c6/port.h"
+#elif CONFIG_IDF_TARGET_ESP32S3
+#include "esp32s3/port.h"
 #endif
 
 /* A port whose streams play from the bank needs no HW_STREAM_WORD. */

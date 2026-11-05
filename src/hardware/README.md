@@ -8,6 +8,7 @@ streams feed the watchdogs through ESP-IDF's HAL, which every ESP32 has.)
 |---|---|---|
 | `esp32c3/` | ESP32-C3 | Supported; boards tested are in its README |
 | `esp32c6/` | ESP32-C6 | Supported (Arduino); boards tested are in its README |
+| `esp32s3/` | ESP32-S3 | Written, builds; not tested on hardware (see its README) |
 
 ## What a port provides
 

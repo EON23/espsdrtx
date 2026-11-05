@@ -11,6 +11,8 @@
 #include "esp32c3/target.h"
 #elif CONFIG_IDF_TARGET_ESP32C6
 #include "esp32c6/target.h"
+#elif CONFIG_IDF_TARGET_ESP32S3
+#include "esp32s3/target.h"
 #else
 #error "espsdrtx: no port for this chip yet (see src/hardware/README.md)"
 #endif

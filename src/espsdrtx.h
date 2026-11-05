@@ -7,10 +7,12 @@
  * around a carrier in the 2.4 GHz ISM band. Or stream samples computed by
  * the CPU (FM, PM, AM, QPSK) for signals that never repeat.
  *
- * Supported chips: ESP32-C3 (src/hardware/ has one directory per chip). The
+ * Supported chips: ESP32-C3 and ESP32-C6; an ESP32-S3 port is written but
+ * not tested on hardware (src/hardware/ has one directory per chip). The
  * library uses undocumented PHY internals (found on ESP-IDF 5.4 and 5.5),
  * takes over the Wi-Fi radio, and reserves RAM for the RF block (128 KiB at
- * 0x3fca0000..0x3fcbffff on the C3).
+ * 0x3fca0000..0x3fcbffff on the C3, 0x40840000..0x4085ffff on the C6; 64 KiB
+ * at 0x3fcd0000..0x3fcdffff on the S3).
  *
  * Not thread-safe: call espsdrtx from one task. Functions returning esp_err_t
  * return ESP_OK on success.
