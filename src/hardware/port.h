@@ -2,12 +2,14 @@
  * The hardware port: what the chip-independent core (espsdrtx.c) needs from
  * the chip's radio. Private to the library.
  *
- * Each chip has a directory hardware/<chip>/ with:
+ * Each chip has a directory hardware/<chip>/, named as ESP-IDF names the
+ * target (esp32c3, esp32s3, ...), with:
  *   - target.h: the public limits (ESPSDRTX_MAX_SAMPLES, ESPSDRTX_MAX_WORD);
  *   - port.h: the HW_* macros below;
  *   - port.c: the hw_* functions below, compiled only for that chip;
  *   - README.md: what is known about the chip, and the boards tested.
- * hardware/README.md says how to add one.
+ * chip.h maps the target to the directory, so adding a chip means the
+ * directory and one entry there. hardware/README.md says how to add one.
  *
  * The model every port follows: the radio plays sample words from a RAM bank
  * in a loop of n words, HW_BANK[0..n-1], at 40 or 80 MS/s. A word holds I and
@@ -24,6 +26,10 @@
  *   HW_LOCK_LO_KHZ	lowest carrier, kHz, where the PLL locks
  *   HW_LOCK_HI_KHZ	highest
  *   HW_FILTER_MAX	largest filter mode espsdrtx_tune accepts
+ *   HW_PHY_START	optional: define it (to 1) when port.c provides
+ *			hw_phy_start(); otherwise the core powers the PHY by
+ *			starting Wi-Fi in null mode, which needs a chip with
+ *			Wi-Fi
  */
 #pragma once
 
@@ -32,16 +38,26 @@
 #include "esp_err.h"
 #include "espsdrtx.h"
 
-#if CONFIG_IDF_TARGET_ESP32C3
-#include "esp32c3/port.h"
-#elif CONFIG_IDF_TARGET_ESP32C6
-#include "esp32c6/port.h"
+/* hardware/<chip>/port.h; target.h (through espsdrtx.h) explains a miss. */
+#if defined(ESPSDRTX_CHIP_PORT_H) && defined(ESPSDRTX_MAX_SAMPLES)
+#include ESPSDRTX_CHIP_PORT_H
 #endif
 
 /* A port whose streams play from the bank needs no HW_STREAM_WORD. */
 #ifndef HW_STREAM_WORD
 #define HW_STREAM_WORD	HW_BANK
 #endif
+
+/**
+ * hw_phy_start() - Power the PHY, for a port that defines HW_PHY_START.
+ *
+ * Called once by espsdrtx_begin, after hw_check_ram and before the first
+ * hw_tune. A port without HW_PHY_START leaves it to the core, which starts
+ * Wi-Fi in null mode (and NVS and the default event loop, which Wi-Fi needs).
+ *
+ * Return: ESP_OK, or the error of the call that failed.
+ */
+esp_err_t hw_phy_start(void);
 
 /**
  * hw_check_ram() - Check that static data stays clear of the RF bank.
@@ -81,10 +97,11 @@ void hw_tx_take(void);
 void hw_loop_run(uint32_t n, espsdrtx_rate_t rate);
 
 /**
- * hw_stream_run() - Start a one-word loop at 80 MS/s for a stream.
+ * hw_stream_run() - Make HW_STREAM_WORD drive the DAC, for a stream.
  *
- * Call after hw_tx_take. The output follows every later store to HW_BANK[0]
- * until hw_release.
+ * A port that streams from the bank starts a one-word loop at 80 MS/s.
+ * Call after hw_tx_take. The output follows every later store to
+ * HW_STREAM_WORD until hw_release; the core has written it 0 before.
  */
 void hw_stream_run(void);
 

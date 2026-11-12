@@ -1,2 +1,4 @@
-CONFIG_IDF_TARGET="esp32c3"
+# Pick the chip with: idf.py set-target <chip> (esp32c3, esp32c6, ...).
+# Console on the USB-Serial-JTAG port, on chips that have one (ignored on
+# the others).
 CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y

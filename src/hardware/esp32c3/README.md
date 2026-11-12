@@ -11,6 +11,8 @@ calls are described at the top of `port.c`.
 | CPU | 160 MHz RISC-V, no FPU: streams run at 160 MHz / period samples per second |
 | Tuning | 2400 to 2483.5 MHz; out of band (opt-in) 2175 to 2790 MHz, where the PLL locked |
 | Filter modes | 0: 21 MHz within 2 dB; 1: measured the same as 0; 2: about 35 MHz within 3 dB |
+| Undocumented calls | libphy's `g_phyFuns[50]` (TX force), `set_chanfreq`, `phy_set_freq`, `txcal_work_mode`, `stop_tx_tone`; ROM `pbus` calls |
+| Arduino board | *ESP32C3 Dev Module* (USB CDC On Boot enabled) |
 | Toolchains | ESP-IDF 5.5, Arduino-ESP32 3.2.0 (IDF 5.4) |
 
 ## Boards tested

@@ -7,10 +7,11 @@
  * around a carrier in the 2.4 GHz ISM band. Or stream samples computed by
  * the CPU (FM, PM, AM, QPSK) for signals that never repeat.
  *
- * Supported chips: ESP32-C3 (src/hardware/ has one directory per chip). The
- * library uses undocumented PHY internals (found on ESP-IDF 5.4 and 5.5),
- * takes over the Wi-Fi radio, and reserves RAM for the RF block (128 KiB at
- * 0x3fca0000..0x3fcbffff on the C3).
+ * Supported chips: one directory each in src/hardware/, where each chip's
+ * README.md gives its figures (the numbers quoted below are the C3's unless
+ * marked). The library uses undocumented PHY internals (found on ESP-IDF 5.4
+ * and 5.5), takes over the radio, and reserves RAM for the RF block (which
+ * RAM is in the chip's README).
  *
  * Not thread-safe: call espsdrtx from one task. Functions returning esp_err_t
  * return ESP_OK on success.
@@ -72,8 +73,9 @@ void espsdrtx_allow_out_of_band(bool on);
  * espsdrtx_tune() - Move the carrier.
  * @khz: carrier in kHz, 2400000..2483500 (wider with
  *	espsdrtx_allow_out_of_band).
- * @filter: the PHY's channel filter mode (on the C3, 0: 21 MHz within 2 dB;
- *	1 measured the same as 0; 2: about 35 MHz within 3 dB).
+ * @filter: the PHY's channel filter mode, 0 up to a per-chip maximum (on
+ *	the C3, 0: 21 MHz within 2 dB; 1 measured the same as 0; 2: about
+ *	35 MHz within 3 dB; other chips in their README).
  *
  * Stops a running transmission.
  *

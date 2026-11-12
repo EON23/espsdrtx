@@ -15,6 +15,8 @@ HackRF One over the air (no cable, no attenuator).
 | CPU | 160 MHz RISC-V, no FPU: streams run at 160 MHz / period samples per second |
 | Tuning | 2400 to 2483.5 MHz. Out of band is not tried yet, so `espsdrtx_allow_out_of_band` adds nothing on the C6 |
 | Filter modes | 0 to 2 accepted as on the C3; all measured the same: flat within 1 dB to ±10 MHz, -10 dB at ±13 MHz, -19 dB at ±15 MHz |
+| Undocumented calls | libphy's `force_txon_mode`, `set_chanfreq`, `phy_set_freq`, `txcal_work_mode`, `ram_stop_tx_tone`, `pbus` calls; ESP-IDF's `phy_track_pll_init`/`deinit` |
+| Arduino board | *XIAO_ESP32C6* (USB CDC On Boot enabled) |
 | Toolchains | Arduino-ESP32 3.2.0 (IDF 5.4). The ESP-IDF build is not tried yet (`idf.py set-target esp32c6`) |
 
 ## Differences from the C3

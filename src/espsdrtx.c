@@ -2,9 +2,10 @@
  * espsdrtx: arbitrary I/Q transmit through an ESP32's Wi-Fi PHY. The API is
  * in espsdrtx.h; everything chip-specific is behind hardware/port.h.
  *
- * Wi-Fi runs in NULL mode only to power the PHY; the port then tunes it and
- * drives the PHY's DAC replay engine, which plays sample words from a RAM
- * bank to the transmitter.
+ * Wi-Fi runs in NULL mode only to power the PHY (a port whose chip has no
+ * Wi-Fi powers it itself, HW_PHY_START); the port then tunes it and drives
+ * the PHY's DAC replay engine, which plays sample words from a RAM bank to
+ * the transmitter.
  *
  * Two ways to play
  * ----------------
@@ -26,14 +27,21 @@
 
 #include "esp_attr.h"
 #include "esp_cpu.h"
-#include "esp_event.h"
 #include "esp_rom_sys.h"
-#include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "hal/mwdt_ll.h"
 #include "hardware/port.h"
-#include "nvs_flash.h"
+#include "soc/soc_caps.h"
 #include "soc/timer_group_struct.h"
+
+#ifndef HW_PHY_START
+#if !SOC_WIFI_SUPPORTED
+#error "espsdrtx: this chip has no Wi-Fi; its port must define HW_PHY_START"
+#endif
+#include "esp_event.h"
+#include "esp_wifi.h"
+#include "nvs_flash.h"
+#endif
 
 /*
  * Frequencies, kHz. The ISM band is always allowed. Out of band (opt-in),
@@ -138,19 +146,16 @@ void espsdrtx_allow_out_of_band(bool on)
 	out_of_band = on;
 }
 
-esp_err_t espsdrtx_begin(uint32_t khz)
+#ifndef HW_PHY_START
+/*
+ * The PHY powered the way every Wi-Fi chip allows: Wi-Fi started in NULL
+ * mode, which powers the PHY without joining or sending.
+ */
+esp_err_t hw_phy_start(void)
 {
-	if (started)
-		return ESP_ERR_INVALID_STATE;
-	/* Checked before Wi-Fi is up, so a bad frequency changes nothing. */
-	if (!khz_ok(khz))
-		return ESP_ERR_INVALID_ARG;
-	esp_err_t e = hw_check_ram();
-
-	if (e != ESP_OK)
-		return e;
 	/* Wi-Fi needs NVS; recover it the way the ESP-IDF examples do. */
-	e = nvs_flash_init();
+	esp_err_t e = nvs_flash_init();
+
 	if (e == ESP_ERR_NVS_NO_FREE_PAGES ||
 	    e == ESP_ERR_NVS_NEW_VERSION_FOUND) {
 		e = nvs_flash_erase();
@@ -163,7 +168,6 @@ esp_err_t espsdrtx_begin(uint32_t khz)
 	e = esp_event_loop_create_default();
 	if (e != ESP_OK && e != ESP_ERR_INVALID_STATE)
 		return e;
-	/* Wi-Fi in NULL mode: powers the PHY without joining or sending. */
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 
 	e = esp_wifi_init(&cfg);
@@ -184,7 +188,22 @@ esp_err_t espsdrtx_begin(uint32_t khz)
 	e = esp_wifi_set_promiscuous(true);
 	if (e != ESP_OK)
 		return e;
-	e = esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE);
+	return esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE);
+}
+#endif
+
+esp_err_t espsdrtx_begin(uint32_t khz)
+{
+	if (started)
+		return ESP_ERR_INVALID_STATE;
+	/* Checked before the PHY is up, so a bad frequency changes nothing. */
+	if (!khz_ok(khz))
+		return ESP_ERR_INVALID_ARG;
+	esp_err_t e = hw_check_ram();
+
+	if (e != ESP_OK)
+		return e;
+	e = hw_phy_start();
 	if (e != ESP_OK)
 		return e;
 	started = true;
@@ -333,15 +352,20 @@ static void stream_off(void)
 	hw_to_rx();
 }
 
-/* Both timer groups' watchdogs; each is write-protected between feeds. */
+/*
+ * Every timer group's watchdog (the C2 has one group, most chips two); each
+ * is write-protected between feeds.
+ */
 static IRAM_ATTR NOINLINE_ATTR void feed_wdts(void)
 {
 	mwdt_ll_write_protect_disable(&TIMERG0);
 	mwdt_ll_feed(&TIMERG0);
 	mwdt_ll_write_protect_enable(&TIMERG0);
+#if SOC_TIMER_GROUPS > 1
 	mwdt_ll_write_protect_disable(&TIMERG1);
 	mwdt_ll_feed(&TIMERG1);
 	mwdt_ll_write_protect_enable(&TIMERG1);
+#endif
 }
 
 /*
